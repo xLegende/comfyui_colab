@@ -33,7 +33,6 @@ A Google Colab notebook for running ComfyUI with pre-configured models, custom n
 3. Ensure GPU runtime is selected: `Runtime > Change runtime type > GPU`
 4. (Optional) Add your Civit AI API key for model downloads
 5. Run the "ComfyUI Setup" cell
-6. Run the "Start ComfyUI" cell
 7. Click the provided `https://xxxxxxx.loca.lt` link to access ComfyUI
 
 ## ⚙️ Configuration Options
@@ -60,25 +59,6 @@ A Google Colab notebook for running ComfyUI with pre-configured models, custom n
 - Google Drive integration
 - Local storage fallback
 
-## 📦 Output Management
-
-Use the "Zip Outputs" cell to:
-- Automatically collect generated images via prefix
-- Create timestamped ZIP archives
-- Save directly to Google Drive
-
-## 💾 Persistent Storage
-
-The notebook supports two storage options:
-1. **Google Drive**: Enable `use_google_drive` for persistent storage
-2. **Local Storage**: Disable for temporary session storage
-
-## 🔧 Advanced Options
-
-- Custom ComfyUI arguments support
-- Clear log options
-- Custom model and LoRA URL support
-
 ## 📝 Notes
 
 - Colab Pro is recommended for better performance
@@ -90,6 +70,7 @@ The notebook supports two storage options:
 
 | Date | Changes |
 |------|---------|
+| 31/10/24 | Added Upscalers and some Improvements |
 | 30/10/24 | Added output zipping |
 | 28/10/24 | Added custom LoRA and Checkpoint download |
 | 26/10/24 | Added Civitai API Key |
