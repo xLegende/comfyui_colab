@@ -1,6 +1,6 @@
 # 🎨 ComfyUI Colab Notebook
 
-A Google Colab notebook for running ComfyUI with pre-configured models, custom nodes, and easy setup.
+A Google Colab notebook for running ComfyUI with models, custom nodes, and easy setup.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/xLegende/ComfyUI_Colab/blob/main/ComfyUI_Colab.ipynb)
 
@@ -70,6 +70,7 @@ A Google Colab notebook for running ComfyUI with pre-configured models, custom n
 
 | Date | Changes |
 |------|---------|
+| 09/11/24 | Added CLIP and SD 3.5 Medium |
 | 31/10/24 | Added Upscalers and some Improvements |
 | 30/10/24 | Added output zipping |
 | 28/10/24 | Added custom LoRA and Checkpoint download |
