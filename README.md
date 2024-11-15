@@ -33,7 +33,7 @@ A Google Colab notebook for running ComfyUI with models, custom nodes, and easy 
 3. Ensure GPU runtime is selected: `Runtime > Change runtime type > GPU`
 4. (Optional) Add your Civit AI API key for model downloads
 5. Run the "ComfyUI Setup" cell
-7. Click the provided `https://xxxxxxx.loca.lt` link to access ComfyUI
+7. Click the provided `https://xxxxxxx.loca.lt` link to access ComfyUI (Now also available for Ngrok)
 
 ## ⚙️ Configuration Options
 
@@ -70,6 +70,7 @@ A Google Colab notebook for running ComfyUI with models, custom nodes, and easy 
 
 | Date | Changes |
 |------|---------|
+| 15/11/24 | Added Ngrok support and Colab secrets for API Keys |
 | 09/11/24 | Added CLIP and SD 3.5 Medium |
 | 31/10/24 | Added Upscalers and some Improvements |
 | 30/10/24 | Added output zipping |
