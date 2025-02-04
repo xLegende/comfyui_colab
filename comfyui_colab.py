@@ -28,33 +28,44 @@ _Notes_:
 
 # Commented out IPython magic to ensure Python compatibility.
 #@title 🚩 ComfyUI Setup
+#@markdown ### ▶️ Colab Secret Names:
+Secret_NGROK = 'NGROK_API_KEY' #@param {type: "string"}
+Secret_CIVITAI = 'Civitai_API_KEY' #@param {type: "string"}
 #@markdown ### ▶️ CivitAI API Key (Required for certain models):
-Civitai_API_Key = '' #@param {type: "string"}
+Civitai_API_KEY = '' #@param {type: "string"}
 #@markdown ### ▶️ NGROK API Key (if using Ngrok):
-NGROK_API_Key='' #@param {type: "string"}
-use_local_storage = True #@param {type:"boolean"}
+NGROK_API_KEY='' #@param {type: "string"}
+use_local_storage = False #@param {type:"boolean"}
 output_path = 'COMFY' #@param {type:"string"}
+version='' #@param {type: "string"}
+
+
 
 #@markdown ## Only check the models you are going to use:
-#@markdown ### SD 3.5 models
+#@markdown ### ▶️ Video models
+Hunyuan = False #@param{type: "boolean"}
+Mochi_FP8 = False #@param{type: "boolean"}
+LTX = False #@param{type: "boolean"}
+Stable_Video_Diffusion = False #@param{type: "boolean"}
+
+#@markdown ### ▶️ SD 3.5 models
 SD35L = False #@param{type: "boolean"}
 SD35M = False #@param{type: "boolean"}
-#@markdown ### Flux models
+#@markdown ### ▶️ Flux models
 Flux1_dev = False #@param{type: "boolean"}
 
-#@markdown ### SDXL models
+#@markdown ### ▶️ SDXL models
 
 SDXL_1 = True #@param{type: "boolean"}
 JuggernautXL_v8 = False #@param{type: "boolean"}
-Pony_Diffusion_XL_v6 = False #@param{type: "boolean"}
 Mistoon_Anime = False #@param{type: "boolean"}
 Anything_XL = False #@param{type: "boolean"}
 
-#@markdown ### SD 1.5 models
+#@markdown ### ▶️ SD 1.5 models
 
 Dreamshaper = False #@param{type: "boolean"}
 
-#@markdown ### Other models
+#@markdown ### ▶️ Other models
 SDXLRefiner = True #@param{type: "boolean"}
 AnimateDiff = False #@param{type: "boolean"}
 
@@ -65,16 +76,41 @@ Custom_LoRA_Name = "" #@param {type: "string"}
 Custom_Model_URL = "" #@param {type: "string"}
 Custom_Model_Name = "" #@param {type: "string"}
 
-#@markdown ### ControlNet models:
-SD_1_5_ControlNet_models = False #@param{type: "boolean"}
+#@markdown ### ▶️ ControlNet models:
+SD_1_5_ControlNet_models = True #@param{type: "boolean"}
 SDXL_ControlNet_models = True #@param{type: "boolean"}
-IP_Adapter_models = True #@param{type: "boolean"}
+IP_Adapter_models = False #@param{type: "boolean"}
 
-#@markdown ### ControlNet models:
+#@markdown ### ▶️ ControlNet models:
 clip_l = True #@param{type: "boolean"}
-t5xxl = True #@param{type: "boolean"}
+t5xxl = False #@param{type: "boolean"}
 clip_vision_g = False #@param{type: "boolean"}
-google_t5_v1 = True #@param{type: "boolean"}
+google_t5_v1 = False #@param{type: "boolean"}
+llava_llama3_fp16 = False #@param{type: "boolean"}
+llava_llama3_fp8 = False #@param{type: "boolean"}
+
+#@markdown ### ▶️ ComfyUI Nodes:
+comfyui_controlnet_aux = True #@param{type: "boolean"}
+comfyui_inpaint_nodes = False #@param{type: "boolean"}
+x_flux_comfyui = True #@param{type: "boolean"}
+ComfyUI_IPAdapter_plus = False #@param{type: "boolean"}
+ComfyUI_AnimateDiff_Evolved = False #@param{type: "boolean"}
+civitai_comfy_nodes = True #@param{type: "boolean"}
+masquerade_nodes_comfyui = False #@param{type: "boolean"}
+comfyui_art_venture = True #@param{type: "boolean"}
+sdxl_prompt_styler = True #@param{type: "boolean"}
+comfy_image_saver = True #@param{type: "boolean"}
+ComfyUI_Crystools = True #@param{type: "boolean"}
+ComfyUI_VideoHelperSuite = False #@param{type: "boolean"}
+ComfyUI_Advanced_ControlNet = True #@param{type: "boolean"}
+ComfyUI_Frame_Interpolation = False #@param{type: "boolean"}
+Derfuu_ComfyUI_ModdedNodes = True #@param{type: "boolean"}
+comfyui_various = False #@param{type: "boolean"}
+ComfyUI_JPS_Nodes = False #@param{type: "boolean"}
+ComfyUI_CogVideoXWrapper = False #@param{type: "boolean"}
+ComfyUI_MVAdapter = False #@param{type: "boolean"}
+ComfyUI_HunyuanVideoWrapper = False #@param{type: "boolean"}
+LoadLoraWithTags = False #@param{type: "boolean"}
 
 #@markdown ### ▶️ Extra ComfyUI arguments
 Extra_arguments = '--disable-smart-memory --port 8188' #@param {type: "string"}
@@ -151,7 +187,8 @@ def initStorage(output_path, app_local_path):
       f'{models_storage_path}/VAE': f'{app_local_path}/models/vae',
       f'{models_storage_path}/VAE-approx': f'{app_local_path}/models/vae',
       f'{models_storage_path}/xlabs/loras': f'{app_local_path}/models/xlabs/loras',
-      f'{models_storage_path}/xlabs/controlnets': f'{app_local_path}/models/xlabs/controlnets',
+      f'{models_storage_path}/ultralytics/bbox': f'{app_local_path}/models/ultralytics/bbox',
+      f'{models_storage_path}/ultralytics/segm': f'{app_local_path}/models/ultralytics/segm',
   }
 
   # Create symbolic links for all models
@@ -236,30 +273,60 @@ def install_custom_nodes():
 #   %cd {customNodeRoot}
   install_custom_node('https://github.com/ltdrdata/ComfyUI-Manager')
   install_custom_node('https://github.com/ltdrdata/ComfyUI-Impact-Pack')
+  install_custom_node('https://github.com/rgthree/rgthree-comfy')
+  install_custom_node('https://github.com/WASasquatch/was-node-suite-comfyui')
+  install_custom_node('https://github.com/pythongosssss/ComfyUI-Custom-Scripts')
+  install_custom_node('https://github.com/ltdrdata/ComfyUI-Inspire-Pack')
   install_custom_node('https://github.com/jags111/efficiency-nodes-comfyui')
   install_custom_node('https://github.com/ssitu/ComfyUI_UltimateSDUpscale')
   install_custom_node('https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes')
-  install_custom_node('https://github.com/Fannovel16/comfyui_controlnet_aux')
-  install_custom_node('https://github.com/pythongosssss/ComfyUI-Custom-Scripts')
-  install_custom_node('https://github.com/rgthree/rgthree-comfy')
-  install_custom_node('https://github.com/Acly/comfyui-inpaint-nodes')
-  install_custom_node('https://github.com/ltdrdata/ComfyUI-Inspire-Pack')
-  install_custom_node('https://github.com/WASasquatch/was-node-suite-comfyui')
-  install_custom_node('https://github.com/XLabs-AI/x-flux-comfyui')
   install_custom_node('https://github.com/pythongosssss/ComfyUI-WD14-Tagger')
-  install_custom_node('https://github.com/cubiq/ComfyUI_IPAdapter_plus')
-  install_custom_node('https://github.com/Kosinkadink/ComfyUI-AnimateDiff-Evolved')
-  install_custom_node('https://github.com/civitai/civitai_comfy_nodes')
   install_custom_node('https://github.com/cubiq/ComfyUI_essentials')
-  install_custom_node('https://github.com/BadCafeCode/masquerade-nodes-comfyui')
-  install_custom_node('https://github.com/sipherxyz/comfyui-art-venture')
-  install_custom_node('https://github.com/twri/sdxl_prompt_styler')
-  install_custom_node('https://github.com/cubiq/ComfyUI_essentials')
-  install_custom_node('https://github.com/giriss/comfy-image-saver')
-  install_custom_node('https://github.com/crystian/ComfyUI-Crystools')
-  install_custom_node('https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite')
-  install_custom_node('https://github.com/Kosinkadink/ComfyUI-Advanced-ControlNet')
-  install_custom_node('https://github.com/Fannovel16/ComfyUI-Frame-Interpolation')
+  install_custom_node('https://github.com/ltdrdata/ComfyUI-Impact-Subpack')
+
+  if(comfyui_controlnet_aux):
+    install_custom_node('https://github.com/Fannovel16/comfyui_controlnet_aux')
+  if(comfyui_inpaint_nodes):
+    install_custom_node('https://github.com/Acly/comfyui-inpaint-nodes')
+  if(x_flux_comfyui):
+    install_custom_node('https://github.com/XLabs-AI/x-flux-comfyui')
+  if(ComfyUI_IPAdapter_plus):
+    install_custom_node('https://github.com/cubiq/ComfyUI_IPAdapter_plus')
+  if(ComfyUI_AnimateDiff_Evolved):
+    install_custom_node('https://github.com/Kosinkadink/ComfyUI-AnimateDiff-Evolved')
+  if(civitai_comfy_nodes):
+    install_custom_node('https://github.com/civitai/civitai_comfy_nodes')
+  if(masquerade_nodes_comfyui):
+    install_custom_node('https://github.com/BadCafeCode/masquerade-nodes-comfyui')
+  if(comfyui_art_venture):
+    install_custom_node('https://github.com/sipherxyz/comfyui-art-venture')
+  if(sdxl_prompt_styler):
+    install_custom_node('https://github.com/twri/sdxl_prompt_styler')
+  if(comfy_image_saver):
+    install_custom_node('https://github.com/giriss/comfy-image-saver')
+  if(ComfyUI_Crystools):
+    install_custom_node('https://github.com/crystian/ComfyUI-Crystools')
+  if(ComfyUI_VideoHelperSuite):
+    install_custom_node('https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite')
+  if(ComfyUI_Advanced_ControlNet):
+    install_custom_node('https://github.com/Kosinkadink/ComfyUI-Advanced-ControlNet')
+  if(ComfyUI_Frame_Interpolation):
+    install_custom_node('https://github.com/Fannovel16/ComfyUI-Frame-Interpolation')
+  if(Derfuu_ComfyUI_ModdedNodes):
+    install_custom_node('https://github.com/Derfuu/Derfuu_ComfyUI_ModdedNodes')
+  if(comfyui_various):
+    install_custom_node('https://github.com/jamesWalker55/comfyui-various')
+  if(ComfyUI_JPS_Nodes):
+    install_custom_node('https://github.com/JPS-GER/ComfyUI_JPS-Nodes')
+  #install_custom_node('https://github.com/alt-key-project/comfyui-dream-project')
+  if(ComfyUI_CogVideoXWrapper):
+    install_custom_node('https://github.com/kijai/ComfyUI-CogVideoXWrapper')
+  if(ComfyUI_MVAdapter):
+    install_custom_node('https://github.com/huanngzh/ComfyUI-MVAdapter')
+  if(LoadLoraWithTags):
+    install_custom_node('https://github.com/Extraltodeus/LoadLoraWithTags')
+  if(ComfyUI_HunyuanVideoWrapper):
+    install_custom_node('https://github.com/kijai/ComfyUI-HunyuanVideoWrapper')
   install_comfyui_impact()
 
 def install_Models():
@@ -270,9 +337,9 @@ def install_Models():
     downloadModel('https://huggingface.co/Comfy-Org/flux1-dev/resolve/main/flux1-dev-fp8.safetensors')
   #SD3.5
   if SD35L:
-    downloadModel('https://civitai.com/api/download/models/983309',rename='SD35L.safetensors',token=Civitai_API_Key)
+    downloadModel('https://civitai.com/api/download/models/983309',rename='SD35L.safetensors',token=Civitai_API_KEY)
   if SD35M:
-    downloadModel('https://civitai.com/api/download/models/1003708',rename='SD35M.safetensors',token=Civitai_API_Key)
+    downloadModel('https://civitai.com/api/download/models/1003708',rename='SD35M.safetensors',token=Civitai_API_KEY)
 
   # SDXL/Pony
   if SDXLRefiner:
@@ -281,19 +348,18 @@ def install_Models():
     downloadModel('https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors')
   if JuggernautXL_v8:
     downloadModel('https://civitai.com/api/download/models/288982')
-  if Pony_Diffusion_XL_v6:
-    downloadModel('https://huggingface.co/Magamanny/Pony-Diffusion-V6-XL/resolve/main/ponyDiffusionV6XL_v6StartWithThisOne.safetensors')
-  if Mistoon_Anime:
-    downloadModel('https://civitai.com/api/download/models/692489',rename="Mistoon_Anime.safetensors",token=Civitai_API_Key)
+   if Mistoon_Anime:
+    downloadModel('https://civitai.com/api/download/models/692489',rename="Mistoon_Anime.safetensors",token=Civitai_API_KEY)
   if Anything_XL:
-    downloadModel('https://civitai.com/api/download/models/384264',rename="Anyting_XL.safetensors",token=Civitai_API_Key)
-    #SD1.5
+    downloadModel('https://civitai.com/api/download/models/384264',rename="Anything_XL.safetensors",token=Civitai_API_KEY)
+
+  #SD1.5
   if Dreamshaper:
-    downloadModel('https://civitai.com/api/download/models/128713',rename="DreamShaper.safetensors",token=Civitai_API_Key)
+    downloadModel('https://civitai.com/api/download/models/128713',rename="DreamShaper.safetensors",token=Civitai_API_KEY)
 
   if Custom_Model_URL and Custom_Model_Name:
     print(f"Downloading custom model: {Custom_Model_Name}")
-    downloadModel(Custom_Model_URL, rename=Custom_Model_Name, token=Civitai_API_Key)
+    downloadModel(Custom_Model_URL, rename=Custom_Model_Name, token=Civitai_API_KEY)
 
 
 def install_LoRAModels():
@@ -301,7 +367,7 @@ def install_LoRAModels():
 
   if Custom_LoRA_URL and Custom_LoRA_Name:
     print(f"Downloading custom LoRA model: {Custom_LoRA_Name}")
-    downloadModel(Custom_LoRA_URL, rename=Custom_LoRA_Name, token=Civitai_API_Key)
+    downloadModel(Custom_LoRA_URL, rename=Custom_LoRA_Name, token=Civitai_API_KEY)
 
 def install_Embeddings():
 #   %cd {ComfyUIRoot}/models/embeddings
@@ -323,14 +389,28 @@ def install_CLIP():
    downloadModel('https://huggingface.co/stabilityai/control-lora/resolve/main/revision/clip_vision_g.safetensors')
   if(google_t5_v1):
     downloadModel('https://huggingface.co/mcmonkey/google_t5-v1_1-xxl_encoderonly/resolve/main/t5xxl_fp8_e4m3fn.safetensors')
+  if(llava_llama3_fp16):
+    downloadModel('https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp16.safetensors')
+  if(llava_llama3_fp8):
+    downloadModel('https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors')
 
 def install_Upscaler():
 #   %cd {ComfyUIRoot}/models/upscale_models
   downloadModel('https://huggingface.co/ai-forever/Real-ESRGAN/resolve/main/RealESRGAN_x2.pth')
   downloadModel('https://huggingface.co/FacehugmanIII/4x_foolhardy_Remacri/resolve/main/4x_foolhardy_Remacri.pth')
 
+def install_Ultralytics():
+#   %cd {ComfyUIRoot}/models/ultralytics/bbox
+  downloadModel('https://huggingface.co/Bingsu/adetailer/resolve/main/face_yolov8m.pt')
+  downloadModel('https://huggingface.co/Bingsu/adetailer/resolve/main/face_yolov8n.pt')
+
+  downloadModel('https://huggingface.co/Bingsu/adetailer/resolve/main/hand_yolov8s.pt')
+#   %cd {ComfyUIRoot}/models/ultralytics/segm
+  downloadModel('https://huggingface.co/Bingsu/adetailer/resolve/main/person_yolov8m-seg.pt')
+
 def install_AnimateDiff():
   if AnimateDiff:
+    print('⏱ Downloading AnimateDiff ...')
 #     %cd {ComfyUIRoot}/models/animatediff_models
     downloadModel('https://huggingface.co/wangfuyun/AnimateLCM/resolve/main/AnimateLCM_sd15_t2v.ckpt')
 #     %cd {ComfyUIRoot}/models/loras
@@ -372,14 +452,61 @@ def install_ControlNetModels():
     downloadModel('https://huggingface.co/lllyasviel/sd_control_collection/resolve/main/sai_xl_sketch_256lora.safetensors')
     downloadModel('https://huggingface.co/lllyasviel/sd_control_collection/resolve/main/t2i-adapter_diffusers_xl_lineart.safetensors')
 
+def install_Video():
+  if Hunyuan:
+#     %cd {ComfyUIRoot}/models/diffusion_models
+    downloadModel('https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors')
+    install_VAE('https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/vae/hunyuan_video_vae_bf16.safetensors')
+
+  if Mochi_FP8:
+    downloadModel('https://huggingface.co/Comfy-Org/mochi_preview_repackaged/resolve/main/all_in_one/mochi_preview_fp8_scaled.safetensors')
+
+  if LTX:
+#     %cd {ComfyUIRoot}/models/clip
+    downloadModel('https://huggingface.co/Comfy-Org/stable-diffusion-3.5-fp8/resolve/main/text_encoders/t5xxl_fp16.safetensors')
+#     %cd {ComfyUIRoot}/models/checkpoints
+    downloadModel('https://huggingface.co/Lightricks/LTX-Video/resolve/main/ltx-video-2b-v0.9.safetensors')
+
+  if Stable_Video_Diffusion:
+#     %cd {ComfyUIRoot}/models/checkpoints
+    downloadModel('https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt/resolve/main/svd_xt.safetensors')
+
+def install_IPAdapter():
   if IP_Adapter_models:
+    print('⏱ Downloading IPAdapters ...')
+    !pip install insightface
+
+    if not os.path.exists(f'{ComfyUIRoot}/models/ipadapter'):
+      os.makedirs(f'{ComfyUIRoot}/models/ipadapter')
+
+#     %cd {ComfyUIRoot}/models/ipadapter
     downloadModel('https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapter_sd15.safetensors')
+    downloadModel('https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapter_sd15_light_v11.bin')
     downloadModel('https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapter-plus_sd15.safetensors')
     downloadModel('https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapter-plus-face_sd15.safetensors')
-    downloadModel('https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid-plusv2_sd15.bin')
+    downloadModel('https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapter-full-face_sd15.safetensors')
+    downloadModel('https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapter_sd15_vit-G.safetensors')
+    downloadModel('https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter_sdxl_vit-h.safetensors')
     downloadModel('https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter-plus_sdxl_vit-h.safetensors')
+    downloadModel('https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter-plus-face_sdxl_vit-h.safetensors')
+    downloadModel('https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter_sdxl.safetensors')
+
+    downloadModel('https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid_sd15.bin')
+    downloadModel('https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid-plusv2_sd15.bin')
+    downloadModel('https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid-portrait-v11_sd15.bin')
     downloadModel('https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid_sdxl.bin')
-    !pip install insightface
+    downloadModel('https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid-plusv2_sdxl.bin')
+    downloadModel('https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid-portrait_sdxl.bin')
+    downloadModel('https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid-portrait_sdxl_unnorm.bin')
+#     %cd {ComfyUIRoot}/models/clip_vision
+    downloadModel('https://huggingface.co/h94/IP-Adapter/resolve/main/models/image_encoder/model.safetensors',rename="CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors")
+    downloadModel('https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/image_encoder/model.safetensors',rename="CLIP-ViT-bigG-14-laion2B-39B-b160k.safetensors")
+
+#     %cd {ComfyUIRoot}/models/loras
+    downloadModel('https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid_sd15_lora.safetensors')
+    downloadModel('https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid-plusv2_sd15_lora.safetensors')
+    downloadModel('https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid_sdxl_lora.safetensors')
+    downloadModel('https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid-plusv2_sdxl_lora.safetensors')
 
 def ngrok_thread(port):
   PASSWORD='googlecolab'
@@ -390,7 +517,7 @@ def ngrok_thread(port):
       if result == 0:
         break
       sock.close()
-  ngrok.set_auth_token(NGROK_API_Key)
+  ngrok.set_auth_token(NGROK_API_KEY)
   http_tunnel = ngrok.connect(port, auth=f"{PASSWORD}:{PASSWORD}")
   print(f'Username/password: {PASSWORD}')
   print(f'ngrok public URL: {http_tunnel.public_url}')
@@ -404,17 +531,20 @@ def ngrok_thread(port):
 # Get secrets
 from google.colab import userdata
 try:
-  NGROK_API_Key = userdata.get('NGROK_API_Key')
+  NGROK_API_KEY = userdata.get(Secret_NGROK)
   print('Used NGROK secret.')
-  Civitai_API_Key = userdata.get('Civitai_API_Key')
+except:
+  NGROK_API_KEY = None
+try:
+  Civitai_API_KEY = userdata.get(Secret_CIVITAI)
   print('Used Civitai secret.')
 except:
-  pass
+  Civitai_API_KEY = None
 
 # Define folders
 root = '/content/'
-ComfyUIRoot = root + '/ComfyUI'
-customNodeRoot = ComfyUIRoot + '/custom_nodes/'
+ComfyUIRoot = os.path.join(root, 'ComfyUI')
+customNodeRoot = os.path.join(ComfyUIRoot, 'custom_nodes')
 
 
 # Install ComfyUI
@@ -433,7 +563,7 @@ image_output_path, image_input_path = initStorage(output_path, ComfyUIRoot)
 !apt-get -y install -qq aria2
 
 # ngrok
-if NGROK_API_Key:
+if NGROK_API_KEY:
 #   %pip install pyngrok
   from pyngrok import ngrok
 
@@ -445,6 +575,9 @@ install_ControlNetModels()
 install_AnimateDiff()
 install_Upscaler()
 install_CLIP()
+install_IPAdapter()
+install_Video()
+install_Ultralytics()
 
 # Install custom nodes
 install_custom_nodes()
@@ -453,13 +586,13 @@ install_custom_nodes()
 !npm install -g localtunnel
 if Clear_Log:
   clear()
-if NGROK_API_Key:
-  port = 8188
+port = 8188
+if NGROK_API_KEY:
   threading.Thread(target=ngrok_thread, daemon=True, args=(port,)).start()
 else:
   # Local tunnel
   !npm install -g localtunnel
-  threading.Thread(target=iframe_thread, daemon=True, args=(8188,)).start()
+  threading.Thread(target=iframe_thread, daemon=True, args=(port,)).start()
 # %cd /content/ComfyUI
 !python main.py --dont-print-server --output-directory {image_output_path} --input-directory {image_input_path} {Extra_arguments}
 
@@ -535,15 +668,3 @@ def zip_and_delete_pngs(prefix, use_google_drive=True, subfolder=None):
 
 # Execute
 zip_and_delete_pngs(zip_prefix, use_google_drive, zip_subfolder)
-
-"""## 📅 Changelog
-|dd.mm.yy|Change|
-|:-|:-|
-|`25/10/24`| Created Notebook|
-|`26/10/24`| Added Civitai API Key|
-|`28/10/24`| Added custom LoRA and Checkpoint download|
-|`30/10/24`| Added output zipping|
-|`31/10/24`| Added Upscalers and some Improvements|
-|`09/11/24`| Added CLIP and SD 3.5 Medium|
-|`15/11/24`| Added Ngrok support and Colab secrets for API Keys|
-"""
